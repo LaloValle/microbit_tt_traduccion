@@ -1,5 +1,5 @@
-const SSID: string = "INFINITUMFE53"
-const PASSWORD: string = "mKYQ9aC9qx"
+const SSID: string = "Zonet"
+const PASSWORD: string = ""
 const PUERTO_API: string = "6614"
 const DIRECCION_API: string = "192.168.1.142"
 const RESPUESTA: number = 7
@@ -120,14 +120,27 @@ function captacion_gestos() {
     let respuesta: string = ''
     while (true) {
         basic.showIcon(IconNames.Skull)
-        respuesta = solicitar_api("PUT", "/configuracion", "", false, 3000, true)
+        respuesta = solicitar_api("PUT", "/configuracion", "", false, 5000, true)
         if (parseInt(respuesta) > 0) break
     }
 
-    basic.showNumber(IconNames.Yes)
-    pause(1000)
-
     while (true) {
+        if (input.buttonIsPressed(Button.A)) {
+            respuesta = solicitar_api("DELETE", "/raspberry/ultimo", "", false, 3000)
+            if (respuesta == 'o'){
+                basic.showIcon(IconNames.Yes)
+                pause(1000)
+            }
+        }
+        if (input.buttonIsPressed(Button.B)) {
+            respuesta = solicitar_api("PUT", "/reproducir/palabra", "", false, 3000)
+            if (respuesta == 'o') {
+                basic.showIcon(IconNames.Yes)
+                pause(1000)
+            }
+        }
+
+
         if (input.pinIsPressed(TouchPin.P2)) {
             tacto_identificado = true
             serie_tiempo.x.push(input.acceleration(Dimension.X))
@@ -136,13 +149,11 @@ function captacion_gestos() {
             pause(periodo)
         } else if (tacto_identificado) {
             tacto_identificado = false
-            gesto = solicitar_api("POST", "/traducir/gesto", JSON.stringify(serie_tiempo), true, 3000) //Se comunica el gesto muestreado
+            gesto = solicitar_api("POST", "/traducir/gesto", JSON.stringify(serie_tiempo), true, 3000, true) //Se comunica el gesto muestreado
             limpiar_serie_tiempo()
             basic.showString(gesto)
         }
     }
-
-    basic.showIcon(IconNames.Happy)
 }
 
 
